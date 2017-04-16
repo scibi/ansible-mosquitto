@@ -1,0 +1,123 @@
+---
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
+
+# debops.mosquitto default variables [[[
+# ===================================
+
+# .. contents:: Sections
+#    :local:
+#
+# .. include:: includes/all.rst
+
+
+# Upstream configuration [[[
+# --------------------------
+
+# .. envvar:: mosquitto__upstream [[[
+#
+# Enable or disable support for upstream APT repositories. By default the
+# OS-distributed package will be installed.
+mosquitto__upstream: '{{ True
+                      if (ansible_local|d() and ansible_local.mosquitto|d() and
+                          ansible_local.mosquitto.upstream is defined and
+                          ansible_local.mosquitto.upstream|bool)
+                      else False }}'
+
+                                                                   # ]]]
+# .. envvar:: mosquitto__upstream_key_id [[[
+#
+# GPG fingerprint of APT repository signing key.
+mosquitto__upstream_key_id: '8277CCB49EC5B595F2D2C71361611AE430993623'
+
+                                                                   # ]]]
+# .. envvar:: mosquitto__upstream_repository [[[
+#
+# URL of the Mosquitto APT repository in ``sources.list`` format.
+mosquitto__upstream_repository: 'deb http://repo.mosquitto.org/debian {{ ansible_distribution_release }} main'
+
+                                                                   # ]]]
+                                                                   # ]]]
+# APT packages [[[
+#-----------------
+
+# .. envvar:: mosquitto__base_packages [[[
+#
+# List of base APT packages to install for Mosquitto support.
+mosquitto__base_packages:
+  - 'mosquitto'
+  - 'mosquitto-clients'
+
+                                                                   # ]]]
+# .. envvar:: mosquitto__packages [[[
+#
+# List of additional APT packages to install with Mosquitto.
+mosquitto__packages: []
+                                                                   # ]]]
+                                                                   # ]]]
+                                                                   
+# Network configuration [[[
+# -------------------------
+
+# .. envvar:: mosquitto__bind_address [[[
+#
+# IP address on which Mosquitto server listens. Set it to False to allow
+# connections from remote hosts over IPv4 and IPv6 on any interface.
+#
+mosquitto__bind_address: False
+
+                                                                   # ]]]
+# .. envvar:: mosquitto__port [[[
+#
+# Port number on which this Mosquitto server listens on.
+mosquitto__port: '1883'
+
+                                                                   # ]]]
+# .. envvar:: mosquitto__allow [[[
+#
+# List of IP addresses or CIDR subnets which will be allowed to connect to the
+# Mosquitto server in :command:`ip(6)tables` and TCP wrappers. If it's empty, remote
+# connections are not allowed.
+mosquitto__allow: []
+
+                                                                   # ]]]
+                                                                   # ]]]
+# Other configuration options [[[                                                                  
+# -------------------------------
+
+# .. envvar:: mosquitto__raw_config [[[
+#
+# Other configuration options which are not supported directly by this role
+mosquitto__raw_config: ''
+
+                                                                   # ]]]
+                                                                   # ]]]
+# Configuration for other Ansible roles [[[
+# -----------------------------------------
+
+# .. envvar:: mosquitto__ferm__dependent_rules [[[
+#
+# Configuration for the debops.ferm_ role.
+mosquitto__ferm__dependent_rules:
+
+  - type: 'accept'
+    dport: [ '{{ mosquitto__port }}' ]
+    saddr: '{{ mosquitto__allow }}'
+    accept_any: True
+    weight: '50'
+    role: 'debops.mosquitto'
+
+                                                                   # ]]]
+# .. envvar:: mosquitto__tcpwrappers__dependent_allow [[[
+#
+# Configuration for the debops.tcpwrappers_ Ansible role.
+mosquitto__tcpwrappers__dependent_allow:
+
+  - daemon: 'mosquitto'
+    client: '{{ mosquitto__allow }}'
+    accept_any: True
+    weight: '50'
+    filename: 'mosquitto_dependent_allow'
+    comment: 'Allow remote connections to Mosquito server'
+                                                                   # ]]]
+                                                                   # ]]]
+                                                                   # ]]]

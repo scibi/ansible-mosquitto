@@ -1,0 +1,47 @@
+---
+
+- name: Get upstream APT GPG key
+  apt_key:
+    id: '{{ mosquitto__upstream_key_id }}'
+    keyserver: '{{ ansible_local.core.keyserver
+                   if (ansible_local|d() and ansible_local.core|d() and
+                       ansible_local.core.keyserver)
+                   else "hkp://pool.sks-keyservers.net" }}'
+    state: 'present'
+  when: mosquitto__upstream|bool
+
+- name: Configure upstream APT repository
+  apt_repository:
+    repo: '{{ mosquitto__upstream_repository }}'
+    state: 'present'
+    update_cache: True
+  when: mosquitto__upstream|bool
+
+- name: Install required packages
+  package:
+    name: '{{ item }}'
+    state: 'present'
+  with_flattened:
+    - '{{ mosquitto__base_packages }}'
+    - '{{ mosquitto__packages }}'
+
+- name: Divert original /etc/mosquitto/mosquitto.conf
+  command: dpkg-divert --quiet --local --divert /etc/mosquitto/mosquitto.conf.dpkg-divert
+           --rename /etc/mosquitto/mosquitto.conf
+  args:
+    creates: '/etc/mosquitto/mosquitto.conf.dpkg-divert'
+
+- name: Install configuration files
+  template:
+    src: '{{ item }}.j2'
+    dest: '/{{ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  with_items:
+    - 'etc/mosquitto/mosquitto.conf'
+    - 'etc/mosquitto/conf.d/01_listener.conf'
+    - 'etc/mosquitto/conf.d/50_raw_options.conf'
+  notify:
+    - 'Restart Mosquitto'
+
