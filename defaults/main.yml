@@ -32,8 +32,10 @@ mosquitto__upstream_key_id: '8277CCB49EC5B595F2D2C71361611AE430993623'
                                                                    # ]]]
 # .. envvar:: mosquitto__upstream_repository [[[
 #
-# URL of the Mosquitto APT repository in ``sources.list`` format.
-mosquitto__upstream_repository: 'deb http://repo.mosquitto.org/debian {{ ansible_distribution_release }} main'
+# Upstream Mosquitto APT repositories
+mosquitto__upstream_repository:
+  Debian: 'deb http://repo.mosquitto.org/debian {{ ansible_distribution_release }} main'
+  Ubuntu: 'ppa:mosquitto-dev/mosquitto-ppa'
 
                                                                    # ]]]
                                                                    # ]]]

@@ -12,6 +12,11 @@ galaxy_info:
     - name: Debian
       versions:
         - jessie
+    - name: Ubuntu
+      versions:
+        - precise
+        - trusty
+        - xenial
   galaxy_tags:
     - mosquitto
     - mqtt

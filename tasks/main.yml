@@ -8,11 +8,11 @@
                        ansible_local.core.keyserver)
                    else "hkp://pool.sks-keyservers.net" }}'
     state: 'present'
-  when: mosquitto__upstream|bool
+  when: mosquitto__upstream|bool and ansible_distribution in [ 'Debian' ]
 
 - name: Configure upstream APT repository
   apt_repository:
-    repo: '{{ mosquitto__upstream_repository }}'
+    repo: '{{ mosquitto__upstream_repository[ansible_distribution] }}'
     state: 'present'
     update_cache: True
   when: mosquitto__upstream|bool
@@ -54,4 +54,10 @@
     - 'etc/mosquitto/conf.d/50_raw_options.conf'
   notify:
     - 'Restart Mosquitto'
+
+- name: Enable and start Mosquitto service
+  service:
+    name: 'mosquitto'
+    state: 'started'
+    enabled: 'yes'
 
