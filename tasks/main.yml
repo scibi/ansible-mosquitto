@@ -25,6 +25,16 @@
     - '{{ mosquitto__base_packages }}'
     - '{{ mosquitto__packages }}'
 
+- name: Create configuration directories
+  file:
+    path: '{{ item }}'
+    state: 'directory'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+  with_items:
+    - '/etc/mosquitto/conf.d'
+
 - name: Divert original /etc/mosquitto/mosquitto.conf
   command: dpkg-divert --quiet --local --divert /etc/mosquitto/mosquitto.conf.dpkg-divert
            --rename /etc/mosquitto/mosquitto.conf

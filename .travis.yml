@@ -10,6 +10,10 @@ virtualenv:
 before_install: True
 install: True
 
+env:
+  - MOSQUITTO_UPSTREAM=False
+  - MOSQUITTO_UPSTREAM=True
+
 script:
   - 'git clone --depth 1 https://github.com/nickjj/rolespec'
   - 'cd rolespec ; bin/rolespec -r https://github.com/scibi/debops-test-suite'    
