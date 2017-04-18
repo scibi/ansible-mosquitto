@@ -11,8 +11,12 @@ before_install: True
 install: True
 
 env:
-  - MOSQUITTO_UPSTREAM=False
-  - MOSQUITTO_UPSTREAM=True
+  - TEST_ANSIBLE_VERSION=stable-2.1 MOSQUITTO_UPSTREAM=True
+  - TEST_ANSIBLE_VERSION=stable-2.2 MOSQUITTO_UPSTREAM=True
+  - TEST_ANSIBLE_VERSION=stable-2.3 MOSQUITTO_UPSTREAM=True
+# Packages included in Ubuntu Xenial (16.04LTS) or newer is required.
+# Travis CI supports only Precise (12.04LTS) and Trusty (14.04LTS).
+#  - MOSQUITTO_UPSTREAM=False
 
 script:
   - 'git clone --depth 1 https://github.com/nickjj/rolespec'
